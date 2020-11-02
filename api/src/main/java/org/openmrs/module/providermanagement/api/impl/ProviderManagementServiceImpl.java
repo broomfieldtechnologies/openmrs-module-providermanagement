@@ -24,6 +24,7 @@ import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.PersonAddress;
 import org.openmrs.PersonAttribute;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.APIException;
@@ -389,6 +390,29 @@ public class ProviderManagementServiceImpl extends BaseOpenmrsService implements
             throw new APIException("Roles cannot be null or empty");
         }
         return dao.getProvidersByProviderRoles(roles, false);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Provider> getProvidersByRolesForEnterprise(List<ProviderRole> roles, 
+    		String enterpriseGuid) {
+        // not allowed to pass null or empty set here
+        if (roles == null || roles.isEmpty()) {
+            throw new APIException("Roles cannot be null or empty");
+        }
+        //return dao.getProvidersByProviderRoles(roles, false);
+        List<Provider> allProviders =  dao.getProvidersByProviderRoles(roles, false);
+		List<Provider> providersForEnterprise = new ArrayList<Provider>();
+		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName("Enterprise");
+		for (Provider provider: allProviders) {
+			if (provider.getPerson().getAttribute(pat) != null) {
+				PersonAttribute paForEnterprise = provider.getPerson().getAttribute(pat);
+				if (paForEnterprise.getValue().equals(enterpriseGuid)) {
+					providersForEnterprise.add(provider);
+				}
+			}
+		}
+		return providersForEnterprise;
     }
 
     @Override
