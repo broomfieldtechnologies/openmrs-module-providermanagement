@@ -975,4 +975,6 @@ public interface ProviderManagementService extends OpenmrsService {
      */
     @Authorized(value = { ProviderManagementConstants.PROVIDER_MANAGEMENT_API_PRIVILEGE, ProviderManagementConstants.PROVIDER_MANAGEMENT_API_READ_ONLY_PRIVILEGE }, requireAll = false)
     public List<Provider> getProvidersByPerson(Person person, boolean includeRetired);
+
+	List<Provider> getProvidersByRolesForEnterprise(List<ProviderRole> roles, String enterpriseGuid);
 }
